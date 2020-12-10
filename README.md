@@ -1,6 +1,7 @@
 # OpenGrok Docker instance with monitoring
 
-Inspired by https://github.com/vegasbrianc/prometheus
+Inspired by https://github.com/vegasbrianc/prometheus and
+https://github.com/Einsteinish/Docker-Compose-Prometheus-and-Grafana
 
 Place the data to index under the `./opengrok/src` directory and run the
 `docker-compose`:
