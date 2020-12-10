@@ -16,4 +16,7 @@ The web application is running on http://localhost:7777
 ## Grafana
 
 The Grafana is available on http://localhost:3333 and it has 2 preconfigured
-dashboards.
+dashboards:
+  - web app latencies
+  - web app JVM statistics
+    - the JVM memory panel has preconfigured alert for 1 GiB overall memory
