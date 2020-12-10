@@ -1,0 +1,3 @@
+opengrok/data/**
+opengrok/src/**
+opengrok/etc/configuration.xml
