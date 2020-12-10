@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.8.0_121" class="java.beans.XMLDecoder">
+ <object class="org.opengrok.indexer.configuration.Configuration" id="Configuration0">
+
+  <void property="statsdConfig">
+     <void property="port">
+       <int>8125</int>
+     </void>
+     <void property="host">
+       <string>omon-statsd-exporter</string>
+     </void>
+     <void property="flavor">
+       <object class="java.lang.Enum" method="valueOf">
+         <class>io.micrometer.statsd.StatsdFlavor</class>
+         <string>ETSY</string>
+       </object>
+     </void>
+  </void>
+
+ </object>
+</java>

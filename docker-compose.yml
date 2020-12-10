@@ -1,0 +1,85 @@
+version: "3"
+
+networks:
+  monitor-net:
+    driver: bridge
+
+services:
+  #
+  # The container names share a common prefix "omon" to avoid conflict
+  # with pre existing containers on the system.
+  #
+  # Also, the port numbers were chosen for the same reason.
+  #
+
+  opengrok:
+    # Runs mirroring + indexing.
+    container_name: omon-opengrok
+    image: opengrok/docker:latest
+    ports:
+      - "7777:8080/tcp"
+    environment:
+      REINDEX: '5'
+      INDEXER_OPT: '-R /opengrok/etc/opengrok-statsd.xml'
+    # Volumes store your data between container upgrades.
+    volumes:
+       - './opengrok/src/:/opengrok/src/'
+       - './opengrok/data/:/opengrok/data/'
+       - './opengrok/etc/:/opengrok/etc/'
+    networks:
+      - monitor-net
+    restart: unless-stopped
+
+  statsd_exporter:
+    # Collects statsd metrics and converts them into Prometheus metrics.
+    container_name: omon-statsd-exporter
+    image: prom/statsd-exporter
+    networks:
+      - monitor-net
+    restart: unless-stopped
+    ports:
+      - "9123:9102"
+      - "8125:8125/udp"
+    volumes:
+      - './mapping.yml:/tmp/mapping.yml'
+    command:
+      - '--statsd.mapping-config=/tmp/mapping.yml'
+      - '--statsd.listen-udp=:8125'
+      - '--web.listen-address=:9102'
+
+  prometheus:
+    # Collects metrics by scraping:
+    #   - the OpenGrok /metrics/prometheus endpoint
+    #   - statsd exporter 9123 TCP port
+    container_name: omon-prometheus
+    image: prom/prometheus
+    expose:
+      - 9999
+    networks:
+      - monitor-net
+    depends_on:
+      - statsd_exporter
+    volumes:
+      - './prometheus.yml:/etc/prometheus/prometheus.yml'
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.listen-address=:9999'
+    restart: unless-stopped
+
+  grafana:
+    # Displays the metrics retrieved from Prometheus.
+    container_name: omon-grafana
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3333:3000/tcp"
+    volumes:
+      - './grafana/provisioning:/etc/grafana/provisioning'
+    networks:
+      - monitor-net
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
