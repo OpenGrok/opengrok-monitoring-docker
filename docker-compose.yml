@@ -1,5 +1,9 @@
 version: "3"
 
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
 networks:
   monitor-net:
     driver: bridge
@@ -60,6 +64,7 @@ services:
     depends_on:
       - statsd_exporter
     volumes:
+      - prometheus_data:/prometheus
       - './prometheus.yml:/etc/prometheus/prometheus.yml'
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -75,6 +80,7 @@ services:
     ports:
       - "3333:3000/tcp"
     volumes:
+      - grafana_data:/var/lib/grafana
       - './grafana/provisioning:/etc/grafana/provisioning'
     networks:
       - monitor-net
