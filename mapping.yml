@@ -2,10 +2,17 @@
 # This is used to expose metrics fromt the OpenGrok indexer.
 
 mappings:
-    # usage:
-    #   jvmMemoryUsed.area.nonheap.id.Compressed_Class_Space.statistic.value:XYZ
+  # usage:
+  #   jvmMemoryUsed.area.nonheap.id.Compressed_Class_Space.statistic.value:XYZ
   - match: "jvmMemoryUsed.area.*.id.*.statistic.value"
     name: "indexer_jvm_memory_used"
     labels:
         area: "$1"
         id: "$2"
+  - match: "processCpuUsage.statistic.value"
+    name: "indexer_cpu_usage"
+  # usage: jvmThreadsStates.state.waiting.statistic.value
+  - match: "jvmThreadsStates.state.*.statistic.value"
+    name: "indexer_thread_states"
+    labels:
+        state: "$1"
